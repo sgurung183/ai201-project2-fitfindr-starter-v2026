@@ -59,24 +59,28 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+- **What it does:** Finds listings in data/listings.json that match a text description, and optionally a size and a price ceiling, ranked by how well they match.
+- **Inputs:** description (str): keywords for what the user wants, e.g. "vintage graphic tee".
+              size (str or None): a size to filter by. None skips size filtering.
+              max_price (float or None): highest price allowed. none skips filtering by max price
+- **Returns:**A list of at most 10 listings, highest score first. Each dict is the full listing: id, title, description, category, style_tags, size, condition, price, colors, brand, platform. brand may be None.
+- **When it has nothing:**an empty list
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:**Asks the model for one or two outfits built around the new item, using pieces from the user’s wardrobe.
+- **Inputs:**new_item (dict): one listing dict from search_listings.
+wardrobe (dict): a dict with an items list of wardrobe items. The list may be empty.
+- **Returns:**A non-empty string with one or two outfits that name specific wardrobe pieces
+- **When it has nothing:**If the wardrobe is empty, it returns general styling advice for the item as a string. Never “” and never an error.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+- **What it does:**Asks the model to write a short caption someone would post about the find.
+- **Inputs:**outfit (str): the text from suggest_outfit.
+new_item (dict): the same listing dict passed to suggest_outfit.
+- **Returns:**A 2–4 sentence caption that mentions the item’s title, price, and platform once each.
+- **When it has nothing:**If outfit is empty or whitespace, it returns “Can’t write a fit card: no outfit suggestion was provided.” without calling the model.
 
 ---
 
@@ -93,7 +97,7 @@
      The grader checks your code against what you claim here, so the file and
      function have to be real. -->
 
-**Branch rule:**
+**Branch rule:**If search_listings returns an empty list, put a message in session["error"] naming the description, size, and price that were searched and what to loosen, then stop. Otherwise, take the first result as session["selected_item"] and go to suggest_outfit.
 
 **Where it lives:** `agent.py::run_agent`
 
